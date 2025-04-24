@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import { Pressable, Text, StyleSheet, Alert, View } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import type { Event } from "../../../store/eventsSlice";
@@ -8,14 +8,14 @@ interface Props {
 }
 
 export default function EventRow({ event }: Props) {
-  const handlePress = useCallback(async () => {
+  const handlePress = async () => {
     try {
       await Clipboard.setStringAsync(JSON.stringify(event));
       Alert.alert("Copied", "Event copied to clipboard");
     } catch {
       Alert.alert("Error", "Failed to copy event");
     }
-  }, [event]);
+  };
 
   return (
     <Pressable style={styles.row} onPress={handlePress}>

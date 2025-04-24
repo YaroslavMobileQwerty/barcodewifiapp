@@ -1,11 +1,10 @@
 import React from "react";
 import { SafeAreaView, FlatList, StyleSheet, Text } from "react-native";
-import { useSelector } from "react-redux";
-import type { RootState } from "../../store";
 import EventRow from "./components/EventRow";
+import { useAppSelector } from "../../store/hooks";
 
 export default function EventListScreen() {
-  const events = useSelector((s: RootState) => s.events.items);
+  const events = useAppSelector((s) => s.events.items);
 
   return (
     <SafeAreaView style={styles.safe}>

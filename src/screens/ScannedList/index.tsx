@@ -1,18 +1,19 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { SafeAreaView, StyleSheet, ListRenderItemInfo } from "react-native";
 import ReorderableList, {
   reorderItems,
   ReorderableListReorderEvent,
 } from "react-native-reorderable-list";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState, AppDispatch } from "../../store";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../store";
 import {
   toggleMark,
   removeCode,
   reorder as saveOrder,
 } from "../../store/scannedCodesSlice";
 import CodeCard from "./components/CodeCard";
-import { logEvent } from "../../store/eventsSlice";
+import { useAppSelector } from "../../store/hooks";
+import { useLogs } from "../../hooks/useLogs";
 
 interface CodeItem {
   id: string;
@@ -21,67 +22,42 @@ interface CodeItem {
 }
 
 export default function ScannedListScreen() {
-  const reduxItems = useSelector((s: RootState) => s.scannedCodes.items);
+  const reduxItems = useAppSelector((state) => state.scannedCodes.items);
   const dispatch = useDispatch<AppDispatch>();
+  const { log } = useLogs();
   const [scannedCodesList, setScannedCodesList] = useState<CodeItem[]>([]);
 
   useEffect(() => {
     setScannedCodesList(reduxItems);
   }, [reduxItems]);
 
-  const handleReorder = useCallback(
-    ({ from, to }: ReorderableListReorderEvent) => {
-      setScannedCodesList((current) => {
-        const next = reorderItems(current, from, to);
-        dispatch(saveOrder({ items: next }));
-        return next;
-      });
-    },
-    [dispatch]
-  );
+  const handleReorder = ({ from, to }: ReorderableListReorderEvent) => {
+    setScannedCodesList((current) => {
+      const next = reorderItems(current, from, to);
+      dispatch(saveOrder({ items: next }));
+      return next;
+    });
+  };
 
-  const onToggle = useCallback(
-    (item: CodeItem) => {
-      dispatch(toggleMark({ id: item.id }));
-      dispatch(
-        logEvent({
-          type: "ToggleBarcode",
-          timestamp: new Date().toISOString(),
-          payload: {
-            itemId: item.id,
-          },
-        })
-      );
-    },
-    [dispatch]
-  );
-  const onDelete = useCallback(
-    (item: CodeItem) => {
-      dispatch(removeCode({ id: item.id }));
-      dispatch(
-        logEvent({
-          type: "DeleteBarcode",
-          timestamp: new Date().toISOString(),
-          payload: {
-            itemId: item.id,
-          },
-        })
-      );
-    },
-    [dispatch]
-  );
+  const onToggle = (item: CodeItem) => {
+    dispatch(toggleMark({ id: item.id }));
 
-  const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<CodeItem>) => (
-      <CodeCard
-        id={item.id}
-        code={item.code}
-        marked={item.marked}
-        onToggle={() => onToggle(item)}
-        onDelete={() => onDelete(item)}
-      />
-    ),
-    [dispatch]
+    log("ToggleBarcode", { itemId: item.id });
+  };
+  const onDelete = (item: CodeItem) => {
+    dispatch(removeCode({ id: item.id }));
+
+    log("DeleteBarcode", { itemId: item.id });
+  };
+
+  const renderItem = ({ item }: ListRenderItemInfo<CodeItem>) => (
+    <CodeCard
+      id={item.id}
+      code={item.code}
+      marked={item.marked}
+      onToggle={() => onToggle(item)}
+      onDelete={() => onDelete(item)}
+    />
   );
 
   return (

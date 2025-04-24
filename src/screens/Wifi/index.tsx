@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import {
   SafeAreaView,
   FlatList,
@@ -10,17 +10,19 @@ import {
 import * as Location from "expo-location";
 import * as IntentLauncher from "expo-intent-launcher";
 import WifiManager from "react-native-wifi-reborn";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState, AppDispatch } from "../../store";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../store";
 import { setNetworks, Network } from "../../store/wifiSlice";
 import ScanButton from "./components/ScanButton";
 import NetworkRow from "./components/NetworkRow";
 import ConnectModal from "./components/ConnectModal";
-import { logEvent } from "../../store/eventsSlice";
+import { useAppSelector } from "../../store/hooks";
+import { useLogs } from "../../hooks/useLogs";
 
 export default function WiFiScreen() {
   const dispatch = useDispatch<AppDispatch>();
-  const networks = useSelector((s: RootState) => s.wifi.networks);
+  const { log } = useLogs();
+  const networks = useAppSelector((state) => state.wifi.networks);
   const [scanning, setScanning] = useState(false);
   const [currentSSID, setCurrentSSID] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -33,7 +35,7 @@ export default function WiFiScreen() {
       .catch(() => setCurrentSSID(null));
   }, []);
 
-  const ensureLocationEnabled = useCallback(async () => {
+  const ensureLocationEnabled = async () => {
     const enabled = await Location.hasServicesEnabledAsync();
     if (!enabled && Platform.OS === "android") {
       Alert.alert(
@@ -52,17 +54,17 @@ export default function WiFiScreen() {
       );
     }
     return enabled;
-  }, []);
+  };
 
-  const requestPermission = useCallback(async () => {
+  const requestPermission = async () => {
     if (Platform.OS === "android") {
       const { status } = await Location.requestForegroundPermissionsAsync();
       return status === "granted";
     }
     return true;
-  }, []);
+  };
 
-  const scanWiFi = useCallback(async () => {
+  const scanWiFi = async () => {
     if (!(await ensureLocationEnabled())) return;
     if (!(await requestPermission())) {
       Alert.alert(
@@ -72,12 +74,9 @@ export default function WiFiScreen() {
       return;
     }
     setScanning(true);
-    dispatch(
-      logEvent({
-        type: "WiFiScanningStarted",
-        timestamp: new Date().toISOString(),
-      })
-    );
+
+    log("WiFiScanningStarted");
+
     try {
       const list = await WifiManager.loadWifiList();
       const parsed: Network[] =
@@ -94,15 +93,15 @@ export default function WiFiScreen() {
     } finally {
       setScanning(false);
     }
-  }, [dispatch, ensureLocationEnabled, requestPermission]);
+  };
 
-  const promptForPassword = useCallback((ssid: string) => {
+  const promptForPassword = (ssid: string) => {
     setSelectedSSID(ssid);
     setPassword("");
     setModalVisible(true);
-  }, []);
+  };
 
-  const connect = useCallback(async () => {
+  const connect = async () => {
     setModalVisible(false);
     try {
       const pwd = password.trim().length ? password : null;
@@ -113,9 +112,9 @@ export default function WiFiScreen() {
     } catch (e: any) {
       Alert.alert("Connection Failed", e.message ?? String(e));
     }
-  }, [password, selectedSSID]);
+  };
 
-  const disconnect = useCallback(async () => {
+  const disconnect = async () => {
     try {
       await WifiManager.disconnect();
       Alert.alert("Disconnected", "You have been disconnected");
@@ -123,7 +122,7 @@ export default function WiFiScreen() {
     } catch (e: any) {
       Alert.alert("Disconnect Failed", e.message ?? String(e));
     }
-  }, []);
+  };
 
   return (
     <SafeAreaView style={styles.container}>

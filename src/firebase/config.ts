@@ -1,14 +1,15 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+import "dotenv/config";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyA8uPdcgI_69MfmWNSAd98aNke8xYSRiKM",
-  authDomain: "barcodewifiapp.firebaseapp.com",
-  projectId: "barcodewifiapp",
-  storageBucket: "barcodewifiapp.firebasestorage.app",
-  messagingSenderId: "209534063685",
-  appId: "1:209534063685:web:1ffdb57e0c95152a267f2c",
-  measurementId: "G-KT8B3JM4PX",
+  apiKey: process.env.apiKey,
+  authDomain: process.env.authDomain,
+  projectId: process.env.projectId,
+  storageBucket: process.env.storageBucket,
+  messagingSenderId: process.env.messagingSenderId,
+  appId: process.env.appId,
+  measurementId: process.env.measurementId,
 };
 
 const app = initializeApp(firebaseConfig);

@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React from "react";
 import { Pressable, Text, StyleSheet } from "react-native";
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import { useReorderableDrag } from "react-native-reorderable-list";
@@ -12,7 +12,7 @@ interface Props {
   onDelete: () => void;
 }
 
-const CodeCard = memo(({ id, code, marked, onToggle, onDelete }: Props) => {
+const CodeCard = ({ id, code, marked, onToggle, onDelete }: Props) => {
   const drag = useReorderableDrag();
 
   return (
@@ -34,7 +34,7 @@ const CodeCard = memo(({ id, code, marked, onToggle, onDelete }: Props) => {
       </Pressable>
     </Swipeable>
   );
-});
+};
 
 export default CodeCard;
 

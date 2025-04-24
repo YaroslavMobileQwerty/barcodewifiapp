@@ -1,18 +1,16 @@
 import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { Provider, useDispatch } from "react-redux";
+import { Provider } from "react-redux";
 import "./src/firebase/config";
 import { store } from "./src/store";
 import AppNavigator from "./src/navigation/AppNavigator";
-import { logEvent } from "./src/store/eventsSlice";
+import { useLogs } from "./src/hooks/useLogs";
 
 function Root() {
-  const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(
-      logEvent({ type: "AppOpened", timestamp: new Date().toISOString() })
-    );
-  }, [dispatch]);
+    const { log } = useLogs();
+    log("AppOpened");
+  }, []);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
