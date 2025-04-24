@@ -7,8 +7,8 @@ import AppNavigator from "./src/navigation/AppNavigator";
 import { useLogs } from "./src/hooks/useLogs";
 
 function Root() {
+  const { log } = useLogs();
   useEffect(() => {
-    const { log } = useLogs();
     log("AppOpened");
   }, []);
 
