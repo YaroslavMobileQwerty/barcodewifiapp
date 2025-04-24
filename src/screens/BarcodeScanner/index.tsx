@@ -12,6 +12,8 @@ import PermissionPrompt from "./components/PermissionPrompt";
 import ScanSection from "./components/ScanSection";
 import ViewCodesSection from "./components/ViewCodesSection";
 import CameraOverlay from "./components/CameraOverlay";
+import ActionButton from "./components/ActionButton";
+import { logEvent } from "../../store/eventsSlice";
 
 type ScannerNavProp = NativeStackNavigationProp<RootStackParamList, "Scanner">;
 
@@ -42,6 +44,13 @@ export default function BarcodeScannerScreen() {
   const handleStartScan = useCallback(() => {
     setScanned(false);
     setShowCamera(true);
+
+    dispatch(
+      logEvent({
+        type: "StartBarcodeScanning",
+        timestamp: new Date().toISOString(),
+      })
+    );
   }, []);
 
   const handleFlip = useCallback(() => {
@@ -51,6 +60,7 @@ export default function BarcodeScannerScreen() {
   const handleBarCodeScanned = useCallback(
     ({ data }: { data: string }) => {
       setShowCamera(false);
+
       if (codes.some((c) => c.code === data)) {
         Alert.alert(
           "Duplicate QR Code",
@@ -64,6 +74,12 @@ export default function BarcodeScannerScreen() {
       }
       setScanned(true);
       dispatch(addCode({ code: data }));
+      dispatch(
+        logEvent({
+          type: "BarcodeScannedSuccessfully",
+          timestamp: new Date().toISOString(),
+        })
+      );
       Alert.alert("Scan Successful", `Scanned code: ${data}`, [
         { text: "Close", style: "cancel" },
         { text: "Scan Again", onPress: handleStartScan },
@@ -72,6 +88,10 @@ export default function BarcodeScannerScreen() {
     },
     [codes, dispatch, handleStartScan, navigation]
   );
+
+  const goToWifi = useCallback(() => {
+    navigation.navigate("Wifi");
+  }, []);
 
   if (!permission) return null;
 
@@ -88,7 +108,9 @@ export default function BarcodeScannerScreen() {
           />
         </View>
       )}
-
+      {!showCamera && (
+        <ActionButton label="Scanning for available Wi-Fi" onPress={goToWifi} />
+      )}
       {showCamera && (
         <View style={styles.flex}>
           <CameraView

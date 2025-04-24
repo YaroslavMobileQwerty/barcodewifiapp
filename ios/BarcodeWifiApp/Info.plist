@@ -80,5 +80,7 @@
     <string>Light</string>
     <key>UIViewControllerBasedStatusBarAppearance</key>
     <false/>
+     <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Needed to scan nearby Wi-Fi networks</string>
   </dict>
 </plist>

@@ -12,6 +12,7 @@ import {
   reorder as saveOrder,
 } from "../../store/scannedCodesSlice";
 import CodeCard from "./components/CodeCard";
+import { logEvent } from "../../store/eventsSlice";
 
 interface CodeItem {
   id: string;
@@ -22,19 +23,50 @@ interface CodeItem {
 export default function ScannedListScreen() {
   const reduxItems = useSelector((s: RootState) => s.scannedCodes.items);
   const dispatch = useDispatch<AppDispatch>();
-  const [data, setData] = useState<CodeItem[]>([]);
+  const [scannedCodesList, setScannedCodesList] = useState<CodeItem[]>([]);
 
   useEffect(() => {
-    setData(reduxItems);
+    setScannedCodesList(reduxItems);
   }, [reduxItems]);
 
   const handleReorder = useCallback(
     ({ from, to }: ReorderableListReorderEvent) => {
-      setData((current) => {
+      setScannedCodesList((current) => {
         const next = reorderItems(current, from, to);
         dispatch(saveOrder({ items: next }));
         return next;
       });
+    },
+    [dispatch]
+  );
+
+  const onToggle = useCallback(
+    (item: CodeItem) => {
+      dispatch(toggleMark({ id: item.id }));
+      dispatch(
+        logEvent({
+          type: "ToggleBarcode",
+          timestamp: new Date().toISOString(),
+          payload: {
+            itemId: item.id,
+          },
+        })
+      );
+    },
+    [dispatch]
+  );
+  const onDelete = useCallback(
+    (item: CodeItem) => {
+      dispatch(removeCode({ id: item.id }));
+      dispatch(
+        logEvent({
+          type: "DeleteBarcode",
+          timestamp: new Date().toISOString(),
+          payload: {
+            itemId: item.id,
+          },
+        })
+      );
     },
     [dispatch]
   );
@@ -45,8 +77,8 @@ export default function ScannedListScreen() {
         id={item.id}
         code={item.code}
         marked={item.marked}
-        onToggle={() => dispatch(toggleMark({ id: item.id }))}
-        onDelete={() => dispatch(removeCode({ id: item.id }))}
+        onToggle={() => onToggle(item)}
+        onDelete={() => onDelete(item)}
       />
     ),
     [dispatch]
@@ -55,7 +87,7 @@ export default function ScannedListScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ReorderableList
-        data={data}
+        data={scannedCodesList}
         onReorder={handleReorder}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}

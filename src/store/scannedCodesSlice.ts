@@ -34,7 +34,6 @@ const scannedCodesSlice = createSlice({
       state.items = state.items.filter((i) => i.id !== action.payload.id);
     },
     reorder(state, action: PayloadAction<{ items: CodeItem[] }>) {
-      console.log("New order:", action.payload.items);
       state.items = [...action.payload.items];
     },
     clearAll(state) {

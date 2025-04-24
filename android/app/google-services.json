@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "209534063685",
+    "project_id": "barcodewifiapp",
+    "storage_bucket": "barcodewifiapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:209534063685:android:c70ae8b510dc0111267f2c",
+        "android_client_info": {
+          "package_name": "com.mobiledeveloper.qwerty.BarcodeWifiApp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGfl5QDIsocoDDRI73zS7hP0qMsE6X8gE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

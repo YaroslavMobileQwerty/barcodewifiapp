@@ -21,8 +21,19 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.mobiledeveloper.qwerty.BarcodeWifiApp"
+      "package": "com.mobiledeveloper.qwerty.BarcodeWifiApp",
+      "googleServicesFile": "./android/app/google-services.json"
     },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableProguardInReleaseBuilds": false
+          }
+        }
+      ]
+    ],
     "web": {
       "favicon": "./assets/favicon.png"
     }
